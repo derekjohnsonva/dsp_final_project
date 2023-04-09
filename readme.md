@@ -11,6 +11,6 @@ For now, we plan on applying these techniques to sleep stage EEG data. This data
 ## Installation
 `pip install -r requirements.txt`
 
-## Super Useful Links (see my notes.md file for other useful links)
-[apply_function](https://mne.tools/stable/generated/mne.io.Raw.html#mne.io.Raw.apply_function)
+## Super Useful Links (see my md file for other useful links)
+The link below uses the [apply_function](https://mne.tools/stable/generated/mne.io.Raw.html#mne.io.Raw.apply_function) to modify data in-place. See my .ipynb file for an example.
 - https://www.nmr.mgh.harvard.edu/mne/0.14/auto_tutorials/plot_modifying_data_inplace.html
