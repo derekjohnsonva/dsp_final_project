@@ -86,7 +86,7 @@ class PeakFinder:
             threshold = (max(signal)-min(signal))/4
 
         root_mean_square = np.sqrt(np.sum(np.square(signal) / len(signal)))
-        ratios = np.array([np.power(x / root_mean_square, 2) for x in signal])
+        ratios = np.power(np.divide(signal, root_mean_square), 2)
         peaks = (ratios > np.roll(ratios, 1)) & (ratios > np.roll(ratios, -1)) & (ratios > threshold)
 
         peak_indexes = []
