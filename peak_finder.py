@@ -129,17 +129,17 @@ class PeakFinder:
         if threshold is None:
             threshold = (np.max(x) - np.min(x)) / 4
         # find indexes of all peaks
-        dx = np.diff(x)
+        diff = np.diff(x)
 
-        ine, ire, ife = np.array([[], [], []], dtype=int)
+        ind_none_edge, ind_rising_edge, ind_falling_edge = np.array([[], [], []], dtype=int)
         if edge is None:
-            ine = np.where((np.hstack((dx, 0)) < 0) & (np.hstack((0, dx)) > 0))[0]
+            ind_none_edge = np.where((np.hstack((diff, 0)) < 0) & (np.hstack((0, diff)) > 0))[0]
         else:
             if edge in ['rising', 'both']:
-                ire = np.where((np.hstack((dx, 0)) <= 0) & (np.hstack((0, dx)) > 0))[0]
+                ind_rising_edge = np.where((np.hstack((diff, 0)) <= 0) & (np.hstack((0, diff)) > 0))[0]
             if edge in ['falling', 'both']:
-                ife = np.where((np.hstack((dx, 0)) < 0) & (np.hstack((0, dx)) >= 0))[0]
-        ind = np.unique(np.hstack((ine, ire, ife)))
+                ind_falling_edge = np.where((np.hstack((diff, 0)) < 0) & (np.hstack((0, diff)) >= 0))[0]
+        ind = np.unique(np.hstack((ind_none_edge, ind_rising_edge, ind_falling_edge)))
 
         """ Removing peaks that do not fit parameters """
 
@@ -153,17 +153,17 @@ class PeakFinder:
             ind = ind[x[ind] >= minimum_height]
         # remove peaks - neighbors < threshold
         if ind.size and threshold > 0:
-            dx = np.min(np.vstack([x[ind]-x[ind-1], x[ind]-x[ind+1]]), axis=0)
-            ind = np.delete(ind, np.where(dx < threshold)[0])
+            diff = np.min(np.vstack([x[ind]-x[ind-1], x[ind]-x[ind+1]]), axis=0)
+            ind = np.delete(ind, np.where(diff < threshold)[0])
         # detect small peaks closer than minimum peak distance
         if ind.size and minimum_distance > 1:
             ind = ind[np.argsort(x[ind])][::-1]  # sort ind by peak height
-            idel = np.zeros(ind.size, dtype=bool)
+            ind_remove = np.zeros(ind.size, dtype=bool)
             for i in range(ind.size):
-                if not idel[i]:
-                    idel = idel | (ind >= ind[i] - minimum_distance) & (ind <= ind[i] + minimum_distance)
-                    idel[i] = 0  # Keep current peak
+                if not ind_remove[i]:
+                    ind_remove = ind_remove | (ind >= ind[i] - minimum_distance) & (ind <= ind[i] + minimum_distance)
+                    ind_remove[i] = 0  # Keep current peak
             # remove the small peaks and sort back the indexes by their occurrence
-            ind = np.sort(ind[~idel])
+            ind = np.sort(ind[~ind_remove])
 
         return ind
