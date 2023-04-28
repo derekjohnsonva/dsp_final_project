@@ -3,3 +3,4 @@ mne
 ipykernel
 matplotlib
 numpy
+scipy
