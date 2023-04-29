@@ -15,8 +15,7 @@ ALICE, BOB = 0, 1
 
 [alice_files, bob_files] = fetch_data(subjects=[ALICE, BOB], recording=[1])
 
-raw_train = mne.io.read_raw_edf(alice_files[0], stim_channel='Event marker',
-                                misc=['Temp rectal'], preload=True)
+raw_train = mne.io.read_raw_edf(alice_files[0], stim_channel="Event marker", misc=["Temp rectal"], preload=True)
 # annot_train = mne.read_annotations(alice_files[1])
 
 # raw_train.set_annotations(annot_train, emit_warning=False)

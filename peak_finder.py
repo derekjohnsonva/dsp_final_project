@@ -2,12 +2,12 @@ import numpy as np
 import mne
 import matplotlib.pyplot as plt
 
-class PeakFinder:
 
+class PeakFinder:
     def naive_logical_find_peaks(signal, min_distance=1, error=1e-6, minimum_peak_height=None):
         """
         Find peaks in a 1D array.
-        
+
         Parameters
         ----------
         signal       : 1D array
@@ -18,22 +18,22 @@ class PeakFinder:
         -------
         ind : 1D array
             indices of the peaks in `signal`
-        
+
         """
         size = signal.size
-        
+
         # Padding the begginning and end of the signal with a value
         # this makes sure that the first and last values of the signal are not peaks
         # and fixes out-of-bound errors
-        pad = np.zeros(size+2*min_distance)
-        pad[:min_distance] = signal[0]-error
-        pad[-min_distance:] = signal[-1]-error
-        pad[min_distance:min_distance+size] = signal
+        pad = np.zeros(size + 2 * min_distance)
+        pad[:min_distance] = signal[0] - error
+        pad[-min_distance:] = signal[-1] - error
+        pad[min_distance : min_distance + size] = signal
 
         # Any value could be a peak candidate
         peak_candidate_bools = np.zeros(size)
         peak_candidate_bools[:] = True
-        
+
         for i in range(min_distance):
             start_before = min_distance - i - 1
             start_central = min_distance
@@ -60,9 +60,9 @@ class PeakFinder:
 
     def naive_mathematical_find_peaks(signal, threshold=0):
         """
-        Performs peak detection on three steps: 
+        Performs peak detection on three steps:
             1. root mean square
-            2. peak to average ratios 
+            2. peak to average ratios
             3. first order logic.
 
         Parameters
@@ -83,7 +83,7 @@ class PeakFinder:
         """
 
         if threshold == 0:
-            threshold = (max(signal)-min(signal))/4
+            threshold = (max(signal) - min(signal)) / 4
 
         root_mean_square = np.sqrt(np.sum(np.square(signal) / len(signal)))
         ratios = np.power(np.divide(signal, root_mean_square), 2)
@@ -95,8 +95,7 @@ class PeakFinder:
                 peak_indexes.append(i)
         return peak_indexes
 
-    def peak_typing_finder(x, minimum_height=None, minimum_distance=1, threshold=0, edge='rising'):
-
+    def peak_typing_finder(x, minimum_height=None, minimum_distance=1, threshold=0, edge="rising"):
         """Detect peaks in data based on their amplitude and other features.
 
         Parameters
@@ -125,7 +124,7 @@ class PeakFinder:
         -----
         heavily based on https://nbviewer.org/github/demotu/BMC/blob/master/notebooks/DetectPeaks.ipynb
         """
-        
+
         if threshold is None:
             threshold = (np.max(x) - np.min(x)) / 4
         # find indexes of all peaks
@@ -135,9 +134,9 @@ class PeakFinder:
         if edge is None:
             ind_none_edge = np.where((np.hstack((diff, 0)) < 0) & (np.hstack((0, diff)) > 0))[0]
         else:
-            if edge in ['rising', 'both']:
+            if edge in ["rising", "both"]:
                 ind_rising_edge = np.where((np.hstack((diff, 0)) <= 0) & (np.hstack((0, diff)) > 0))[0]
-            if edge in ['falling', 'both']:
+            if edge in ["falling", "both"]:
                 ind_falling_edge = np.where((np.hstack((diff, 0)) < 0) & (np.hstack((0, diff)) >= 0))[0]
         ind = np.unique(np.hstack((ind_none_edge, ind_rising_edge, ind_falling_edge)))
 
@@ -146,14 +145,14 @@ class PeakFinder:
         # first and last values of x cannot be peaks
         if ind.size and ind[0] == 0:
             ind = ind[1:]
-        if ind.size and ind[-1] == x.size-1:
+        if ind.size and ind[-1] == x.size - 1:
             ind = ind[:-1]
         # remove peaks < minimum peak height
         if ind.size and minimum_height is not None:
             ind = ind[x[ind] >= minimum_height]
         # remove peaks - neighbors < threshold
         if ind.size and threshold > 0:
-            diff = np.min(np.vstack([x[ind]-x[ind-1], x[ind]-x[ind+1]]), axis=0)
+            diff = np.min(np.vstack([x[ind] - x[ind - 1], x[ind] - x[ind + 1]]), axis=0)
             ind = np.delete(ind, np.where(diff < threshold)[0])
         # detect small peaks closer than minimum peak distance
         if ind.size and minimum_distance > 1:
